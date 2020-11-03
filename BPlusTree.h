@@ -12,27 +12,33 @@ int ORDER = 3;
 const std::string indexfile = "index.dat";
 #define FILESIZE getFileSize(indexfile)
 
+// Retorna true cuando la primera palabra es menor
+bool isGreater(const char* palabra1, const char* palabra2) {
+    return strcmp(palabra1, palabra2) < 0;
+}
+
+bool isGreaterOrEqual(const char* palabra1, const char* palabra2) {
+    return strcmp(palabra1, palabra2) <= 0;
+}
+
 struct Registro {
-    unsigned id;
-    char name[20];
-    short pin;
-    char country[35];
+    char palabra[50];
+    unsigned long direccion = 0;
+    unsigned long offset = 0;
 
     Registro() = default;
 
-    Registro(unsigned id, string name, short pin, string country) {
-        this->id = id;
-        strncpy(this->name, name.c_str(), 20);
-        this->pin = pin;
-        strncpy(this->country, country.c_str(), 35);
+    Registro(const string& palabra, unsigned long direccion, unsigned long offset) {
+        strncpy(this->palabra, palabra.c_str(), 50);
+        this->direccion = direccion;
+        this->offset = offset;
     }
 
     void print() {
         if (!this) return;
-        cout << id << " ";
-        cout << name << " ";
-        cout << pin << " ";
-        cout << country << "\n";
+        cout << palabra << " ";
+        cout << direccion << " ";
+        cout << offset << "\n";
     }
 };
 
@@ -91,7 +97,7 @@ private:
             }
             registros[j+1] = registros[j];
             children[j+1] = children[j];
-            data[j] = registro->id;
+            data[j] = registro->palabra;
             registros[j] = registro;
             this->count++;
         }
@@ -103,9 +109,9 @@ private:
         state_t insert(Registro* registro) {
             // binary_search
             size_t index = 0;
-            unsigned value = registro->id;
+            auto value = registro->palabra;
 
-            while (this->data[index] < value  && index < this->count) {
+            while (this->data[index] && isGreater(this->data[index], value) && index < this->count) {
                 index += 1; 
             }
 
@@ -635,26 +641,26 @@ public:
 
     };
 
-    iterator find(const T& value) {
-        return find_helper(&root, value, &root);
+    iterator find(const string& value) {
+        return find_helper(&root, value.c_str(), &root);
     }
 
-    iterator find_helper(node* ptr, const T& value, node* ptr_parent) {
+    iterator find_helper(node* ptr, const char* value, node* ptr_parent) {
         size_t index = 0;
         if (ptr->isLeaf) {
             // < porque si es igual se debe detener
-            while (ptr->data[index] < value && index < ptr->count) {
+            while (isGreater(ptr->data[index], value) && index < ptr->count) {
                 ++index;
             }
         } else {
             // <= porque si es igual ESE valor esta en el siguiente indice
-            while (ptr->data[index] <= value && index < ptr->count) {
+            while (isGreaterOrEqual(ptr->data[index], value) && index < ptr->count) {
                 ++index;
             }
         }
 
         if (ptr->isLeaf) {
-            if (index < ptr->count && ptr->data[index] == value) {
+            if (index < ptr->count && strcmp(ptr->data[index], value) == 0) {
                 return iterator(ptr, index, ptr_parent);
             }
             return iterator(nullptr, 0);
