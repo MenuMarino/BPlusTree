@@ -11,10 +11,10 @@ int main() {
     bt.build("file.db");
     bt.print();
 
-    typedef btree<int>::iterator btree_iterator;
-    auto beg = bt.find("DvorakLeft");
-    beg.ptr->registros[beg.index]->print();
-    (*beg)->print();
+//    typedef btree<int>::iterator btree_iterator;
+//    auto beg = bt.find("DvorakLeft");
+//    beg.ptr->registros[beg.index]->print();
+//    (*beg)->print();
 
     return 0;
 }

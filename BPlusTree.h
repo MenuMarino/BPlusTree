@@ -31,22 +31,23 @@ bool isGreaterOrEqual(const char* palabra1, const char* palabra2) {
 
 struct Registro {
     char palabra[50];
-    unsigned long direccion = 0;
-    unsigned long offset = 0;
+    vector<pair<unsigned long, unsigned long>> direcciones;
 
     Registro() = default;
 
     Registro(const string& palabra, unsigned long direccion, unsigned long offset) {
         strncpy(this->palabra, palabra.c_str(), 50);
-        this->direccion = direccion;
-        this->offset = offset;
+        direcciones.emplace_back(direccion, offset);
     }
 
     void print() {
         if (!this) return;
         cout << palabra << " ";
-        cout << direccion << " ";
-        cout << offset << "\n";
+        for (const auto& i : direcciones) {
+            cout << i.first << " ";
+            cout << i.second << ". ";
+        }
+        cout << endl;
     }
 };
 
@@ -234,7 +235,7 @@ private:
             myFile.close();
 
             myFile.open(indexfile, ios::app | ios::binary | ios::out);
-            child2->filePosition = FILESIZE; // FIXME: Facil tiene lag el write
+            child2->filePosition = FILESIZE;
             writeNode(myFile, child2);
             myFile.close();
             if (ptr_next) {
@@ -699,8 +700,11 @@ public:
         while(getline(file,line)) {
             offset = (unsigned int)file.tellg() - pgdir;
             key = getFileNameFromRoute(line);
+            cout << "================" << endl;
+            cout << "key: " << key << endl;
             insert(key, pgdir, offset);
             pgdir = file.tellg();
+            print();
         }
         file.close();
     }
