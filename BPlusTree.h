@@ -700,11 +700,11 @@ public:
         while(getline(file,line)) {
             offset = (unsigned int)file.tellg() - pgdir;
             key = getFileNameFromRoute(line);
-            cout << "================" << endl;
-            cout << "key: " << key << endl;
+//            cout << "================" << endl;
+//            cout << "key: " << key << endl;
             insert(key, pgdir, offset);
             pgdir = file.tellg();
-            print();
+//            print();
         }
         file.close();
     }
