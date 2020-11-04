@@ -14,6 +14,14 @@ const std::string indexfile = "index.dat";
 
 // Retorna true cuando la primera palabra es menor
 bool isGreater(const char* palabra1, const char* palabra2) {
+    if (palabra1 == nullptr)
+        return true;
+    if (palabra2 == nullptr)
+        return false;
+    if (palabra1[0] == '\0')
+        return true;
+    if (palabra2[0] == '\0')
+        return false;
     return strcmp(palabra1, palabra2) < 0;
 }
 
@@ -88,6 +96,7 @@ private:
         }
 
         void insert_into(size_t index, Registro* registro) {
+            if (!this) return;
             size_t j = this->count;
             while (j > index) {
                 registros[j+1] = registros[j];
@@ -111,7 +120,7 @@ private:
             size_t index = 0;
             auto value = registro->palabra;
 
-            while (this->data[index] && isGreater(this->data[index], value) && index < this->count) {
+            while (this->data[index] && index < this->count && isGreater(this->data[index], value)) {
                 index += 1; 
             }
 
@@ -237,6 +246,7 @@ private:
             parent->insert_into(position, ptr->registros[mid]);
             parent->children[position] = child1->filePosition;
             parent->children[position + 1] = child2->filePosition;
+            parent->count = 1;
 
             myFile.open(indexfile, ios::app | ios::binary | ios::out);
             setWritePos(myFile, parent->filePosition);
@@ -332,6 +342,15 @@ public:
 
     btree() {
         root.isLeaf = 1;
+    }
+
+    void insert(const string& name, unsigned long dir, unsigned long off) {
+        auto registro = new Registro(name, dir, off);
+        auto state = root.insert(registro);
+        if (state == state_t::OVERFLOW) {
+            // split root node
+            split_root();
+        }
     }
 
     void insert(Registro* registro) {
@@ -497,7 +516,7 @@ private:
                     print(child, level + 1);
 
                 for (int k = 0; k < level; k++) {
-                    std::cout << "    ";
+                    std::cout << "\t\t";
                 }
                 if (ptr->isLeaf) {
                     std::cout << ptr->data[i] << "*" << "\n";
@@ -672,7 +691,38 @@ public:
         return find_helper(_nodo, value, ptr);
     }
 
+    void build(const string& filename){
+        ifstream file(filename);
+        // ofstream keys("keys.db");
+        string line, key;
+        unsigned int pgdir = 0, offset;
+        while(getline(file,line)) {
+            offset = (unsigned int)file.tellg() - pgdir;
+            key = getFileNameFromRoute(line);
+            insert(key, pgdir, offset);
+            pgdir = file.tellg();
+        }
+        file.close();
+    }
+
 private:
+    string getFileNameFromRoute(string s) {
+        string delimiter = "/";
+
+        size_t pos = 0;
+        string token;
+        while ((pos = s.find(delimiter)) != string::npos) {
+            token = s.substr(0, pos);
+            s.erase(0, pos + delimiter.length());
+        }
+
+        if ((pos = s.find('.')) != string::npos) {
+            token = s.substr(0, pos);
+            return token;
+        }
+        return "error";
+    }
+
     node root;
     size_t head = -1; // head of the dll
 };
