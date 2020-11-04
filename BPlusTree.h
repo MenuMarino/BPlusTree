@@ -247,7 +247,7 @@ private:
             parent->insert_into(position, ptr->registros[mid]);
             parent->children[position] = child1->filePosition;
             parent->children[position + 1] = child2->filePosition;
-            parent->count = 1;
+            parent->isLeaf = false;
 
             myFile.open(indexfile, ios::app | ios::binary | ios::out);
             setWritePos(myFile, parent->filePosition);
