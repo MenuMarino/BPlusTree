@@ -26,6 +26,14 @@ bool isGreater(const char* palabra1, const char* palabra2) {
 }
 
 bool isGreaterOrEqual(const char* palabra1, const char* palabra2) {
+    if (palabra1 == nullptr)
+        return true;
+    if (palabra2 == nullptr)
+        return false;
+    if (palabra1[0] == '\0')
+        return true;
+    if (palabra2[0] == '\0')
+        return false;
     return strcmp(palabra1, palabra2) <= 0;
 }
 
@@ -99,6 +107,11 @@ private:
         void insert_into(size_t index, Registro* registro) {
             if (!this) return;
             size_t j = this->count;
+            if (this->registros[index] && registro && strcmp(this->registros[index]->palabra, registro->palabra) == 0) {
+//                cout << "Son iguales" << endl;
+                this->registros[index]->direcciones.push_back(registro->direcciones[0]);
+                return;
+            }
             while (j > index) {
                 registros[j+1] = registros[j];
                 children[j+1] = children[j];
@@ -669,12 +682,12 @@ public:
         size_t index = 0;
         if (ptr->isLeaf) {
             // < porque si es igual se debe detener
-            while (isGreater(ptr->data[index], value) && index < ptr->count) {
+            while (ptr->data[index] && index < ptr->count && isGreater(ptr->data[index], value) && index < ptr->count) {
                 ++index;
             }
         } else {
             // <= porque si es igual ESE valor esta en el siguiente indice
-            while (isGreaterOrEqual(ptr->data[index], value) && index < ptr->count) {
+            while (ptr->data[index] && index < ptr->count && isGreaterOrEqual(ptr->data[index], value) && index < ptr->count) {
                 ++index;
             }
         }
