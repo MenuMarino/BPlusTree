@@ -15,11 +15,11 @@ const std::string indexfile = "index.dat";
 // Retorna true cuando la primera palabra es menor
 bool isGreater(const char* palabra1, const char* palabra2) {
     if (palabra1 == nullptr)
-        return true;
+        return false;
     if (palabra2 == nullptr)
         return false;
     if (palabra1[0] == '\0')
-        return true;
+        return false;
     if (palabra2[0] == '\0')
         return false;
     return strcmp(palabra1, palabra2) < 0;
@@ -27,34 +27,34 @@ bool isGreater(const char* palabra1, const char* palabra2) {
 
 bool isGreaterOrEqual(const char* palabra1, const char* palabra2) {
     if (palabra1 == nullptr)
-        return true;
+        return false;
     if (palabra2 == nullptr)
         return false;
     if (palabra1[0] == '\0')
-        return true;
+        return false;
     if (palabra2[0] == '\0')
         return false;
     return strcmp(palabra1, palabra2) <= 0;
 }
 
 struct Registro {
-    char palabra[50];
-    vector<pair<unsigned long, unsigned long>> direcciones;
+    char palabra[50]{};
+//    vector<pair<unsigned long, unsigned long>> direcciones;
 
     Registro() = default;
 
     Registro(const string& palabra, unsigned long direccion, unsigned long offset) {
         strncpy(this->palabra, palabra.c_str(), 50);
-        direcciones.emplace_back(direccion, offset);
+//        direcciones.emplace_back(direccion, offset);
     }
 
     void print() {
         if (!this) return;
         cout << palabra << " ";
-        for (const auto& i : direcciones) {
-            cout << i.first << " ";
-            cout << i.second << ". ";
-        }
+//        for (const auto& i : direcciones) {
+//            cout << i.first << " ";
+//            cout << i.second << ". ";
+//        }
         cout << endl;
     }
 };
@@ -109,7 +109,7 @@ private:
             size_t j = this->count;
             if (this->registros[index] && registro && strcmp(this->registros[index]->palabra, registro->palabra) == 0) {
 //                cout << "Son iguales" << endl;
-                this->registros[index]->direcciones.push_back(registro->direcciones[0]);
+//                registros[index]->direcciones.push_back(registro->direcciones[0]);
                 return;
             }
             while (j > index) {
@@ -237,11 +237,12 @@ private:
             child1->next = child2->filePosition;
             child2->prev = child1->filePosition;
 
-            if (ptr_prev) {
-                child1->prev = ptr_prev->filePosition;
-                ptr_prev->next = child1->filePosition;
-                parent->children[position - 1] = ptr_prev->filePosition;
-            }
+            // FIXME: Esto da bug
+//            if (ptr_prev) {
+//                child1->prev = ptr_prev->filePosition;
+//                ptr_prev->next = child1->filePosition;
+//                parent->children[position - 1] = ptr_prev->filePosition;
+//            }
 
             myFile.open(indexfile, ios::app | ios::binary | ios::out);
             writeNode(myFile, child1);
@@ -251,11 +252,12 @@ private:
             child2->filePosition = FILESIZE;
             writeNode(myFile, child2);
             myFile.close();
-            if (ptr_next) {
-                ptr_next->prev = child2->filePosition;
-                child2->next = ptr_next->filePosition;
-                parent->children[position + 2] = ptr_next->filePosition;
-            }
+            // FIXME: Esto da bug
+//            if (ptr_next) {
+//                ptr_next->prev = child2->filePosition;
+//                child2->next = ptr_next->filePosition;
+//                parent->children[position + 2] = ptr_next->filePosition;
+//            }
 
             parent->insert_into(position, ptr->registros[mid]);
             parent->children[position] = child1->filePosition;
@@ -618,7 +620,7 @@ private:
         myFile.close();
 
         myFile.open(indexfile, ios::app | ios::binary | ios::out);
-        child2->filePosition = FILESIZE; // FIXME: Facil tiene lag el write
+        child2->filePosition = FILESIZE;
         writeNode(myFile, child2);
         myFile.close();
 
@@ -711,14 +713,15 @@ public:
         string line, key;
         unsigned int pgdir = 0, offset;
         while(getline(file,line)) {
-            offset = (unsigned int)file.tellg() - pgdir;
+            offset = (unsigned int) file.tellg() - pgdir;
             key = getFileNameFromRoute(line);
             keys.push_back(key);
-//            cout << "================" << endl;
-//            cout << "key: " << key << endl;
+
             insert(key, pgdir, offset);
             pgdir = file.tellg();
-//            print();
+            cout << "================" << endl;
+            cout << "key: " << key << endl;
+            print();
         }
         file.close();
         return keys;
