@@ -5,6 +5,8 @@
 
 using namespace std;
 
+vector<string> notFound;
+
 int main() {
     btree<char*> bt;
     unordered_map<string, bool> hash;
@@ -19,10 +21,10 @@ int main() {
 
     for (const auto& key : keys) {
         if (hash[key]) { continue; } // Ya busco a este key
+        hash[key] = true; // Lo encuentre o no lo va a marcar.
 
         auto beg = bt.find(key);
         if (beg.ptr) {
-            hash[key] = true;
             cout << '\n';
             beg.ptr->registros[beg.index]->print();
             for (auto direccion_offset : beg.ptr->registros[beg.index]->direcciones) {
@@ -32,11 +34,16 @@ int main() {
                 cout << "Ruta: " << buffer << '\n';
             }
         }
-        else
+        else{
             cont++;
+            notFound.push_back(key);
+        }
     }
     //FIXME
     cout << "El find no encontró " << cont << " archivos." << endl;
+    for (const auto& i : notFound) {
+        cout << i << endl;
+    }
 
     file.close();
     return 0;
