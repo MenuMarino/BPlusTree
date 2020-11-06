@@ -11,11 +11,15 @@ int main() {
     auto keys = bt.build("file.db");
     cout << "================" << endl;
     bt.print();
-
+    int cont = 0;
     for (const auto& key : keys) {
         auto beg = bt.find(key);
-        beg.ptr->registros[beg.index]->print();
+        if (beg.ptr)
+            beg.ptr->registros[beg.index]->print();
+        else
+            cont++;
     }
-
+    //FIXME
+    cout << "El find no encontró " << cont << " archivos." << endl;
     return 0;
 }
