@@ -235,8 +235,7 @@ private:
             child1->registros[i] = ptr->registros[i];
 
             size_t mid = i;
-            // BELLACO
-//            i += 1;
+            i += 1;
             size_t j = 0;
             // B+
             if (ptr->isLeaf != 0) {
@@ -739,15 +738,11 @@ public:
             offset = (unsigned int) file.tellg() - pgdir;
             key = getFileNameFromRoute(line);
             keys.push_back(key);
-            if (strcmp(key.c_str(), "interactive") == 0) {
-                insert(key, pgdir, offset);
-            } else {
-                insert(key, pgdir, offset);
-            }
+            insert(key, pgdir, offset);
             pgdir = file.tellg();
-            cout << "================" << endl;
-            cout << "key: " << key << endl;
-            print();
+//            cout << "================" << endl;
+//            cout << "key: " << key << endl;
+//            print();
         }
         file.close();
         return keys;
