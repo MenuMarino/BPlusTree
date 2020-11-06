@@ -104,6 +104,28 @@ private:
             cout << "Prev: " << this->prev << "\n";
         }
 
+        void insert_into(size_t index, const string& key, unsigned long dir = 0, unsigned long off = 0) {
+            auto registro = new Registro(key, dir, off);
+            if (!this) return;
+            size_t j = this->count;
+            if (this->registros[index] && registro && strcmp(this->registros[index]->palabra, registro->palabra) == 0) {
+//                cout << "Son iguales" << endl;
+//                registros[index]->direcciones.push_back(registro->direcciones[0]);
+                return;
+            }
+            while (j > index) {
+                registros[j+1] = registros[j];
+                children[j+1] = children[j];
+                data[j] = data[j-1];
+                j--;
+            }
+            registros[j+1] = registros[j];
+            children[j+1] = children[j];
+            data[j] = registro->palabra;
+            registros[j] = registro;
+            this->count++;
+        }
+
         void insert_into(size_t index, Registro* registro) {
             if (!this) return;
             size_t j = this->count;
@@ -213,7 +235,8 @@ private:
             child1->registros[i] = ptr->registros[i];
 
             size_t mid = i;
-            i += 1; 
+            // BELLACO
+//            i += 1;
             size_t j = 0;
             // B+
             if (ptr->isLeaf != 0) {
@@ -259,7 +282,7 @@ private:
 //                parent->children[position + 2] = ptr_next->filePosition;
 //            }
 
-            parent->insert_into(position, ptr->registros[mid]);
+            parent->insert_into(position, ptr->data[mid]);
             parent->children[position] = child1->filePosition;
             parent->children[position + 1] = child2->filePosition;
 
@@ -716,8 +739,11 @@ public:
             offset = (unsigned int) file.tellg() - pgdir;
             key = getFileNameFromRoute(line);
             keys.push_back(key);
-
-            insert(key, pgdir, offset);
+            if (strcmp(key.c_str(), "interactive") == 0) {
+                insert(key, pgdir, offset);
+            } else {
+                insert(key, pgdir, offset);
+            }
             pgdir = file.tellg();
             cout << "================" << endl;
             cout << "key: " << key << endl;
