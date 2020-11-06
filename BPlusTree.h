@@ -39,22 +39,22 @@ bool isGreaterOrEqual(const char* palabra1, const char* palabra2) {
 
 struct Registro {
     char palabra[50]{};
-//    vector<pair<unsigned long, unsigned long>> direcciones;
+    vector<pair<unsigned long, unsigned long>> direcciones;
 
     Registro() = default;
 
     Registro(const string& palabra, unsigned long direccion, unsigned long offset) {
         strncpy(this->palabra, palabra.c_str(), 50);
-//        direcciones.emplace_back(direccion, offset);
+        direcciones.emplace_back(direccion, offset);
     }
 
     void print() {
         if (!this) return;
         cout << palabra << " ";
-//        for (const auto& i : direcciones) {
-//            cout << i.first << " ";
-//            cout << i.second << ". ";
-//        }
+        for (const auto& i : direcciones) {
+            cout << i.first << " ";
+            cout << i.second << ". ";
+        }
         cout << endl;
     }
 };
@@ -110,7 +110,7 @@ private:
             size_t j = this->count;
             if (this->registros[index] && registro && strcmp(this->registros[index]->palabra, registro->palabra) == 0) {
 //                cout << "Son iguales" << endl;
-//                registros[index]->direcciones.push_back(registro->direcciones[0]);
+                registros[index]->direcciones.push_back(registro->direcciones[0]);
                 return;
             }
             while (j > index) {
@@ -131,7 +131,7 @@ private:
             size_t j = this->count;
             if (this->registros[index] && registro && strcmp(this->registros[index]->palabra, registro->palabra) == 0) {
 //                cout << "Son iguales" << endl;
-//                registros[index]->direcciones.push_back(registro->direcciones[0]);
+                registros[index]->direcciones.push_back(registro->direcciones[0]);
                 return;
             }
             while (j > index) {
@@ -729,7 +729,7 @@ public:
     }
 
     vector<string> build(const string& filename){
-        ifstream file(filename);
+        ifstream file(filename, ios::binary);
         vector<string> keys;
         // ofstream keys("keys.db");
         string line, key;
