@@ -18,6 +18,12 @@ enum Language {
     ITALIAN
 };
 
+enum state_t {
+    B_OVERFLOW,
+    B_UNDERFLOW,
+    B_OK
+};
+
 const std::string indexfile = "index.dat";
 #define FILESIZE getFileSize(indexfile)
 
@@ -113,8 +119,6 @@ template<typename T>
 // ahora es un B+
 class btree {
 private:
-
-    enum state_t { OVERFLOW, UNDERFLOW, B_OK };
 
     struct node {
         T* data; // keys
@@ -268,7 +272,7 @@ private:
                 myFile.close();
 
                 auto state = child->insert(registro, lang);
-                if (state == state_t::OVERFLOW) {
+                if (state == state_t::B_OVERFLOW) {
                     // split
                     myFile.open(indexfile, ios::binary | ios::in | ios::out);
                     setWritePos(myFile, child->filePosition);
@@ -283,7 +287,7 @@ private:
                 }
 
             }
-            return this->count > ORDER ? OVERFLOW : B_OK;
+            return this->count > ORDER ? B_OVERFLOW : B_OK;
         }
 
         void split(size_t position, Language lang) {
@@ -463,7 +467,7 @@ public:
     void insert(const string& name, unsigned long dir, unsigned long off, Language lang) {
         auto registro = new Registro(name, dir, off, lang);
         auto state = root.insert(registro, lang);
-        if (state == state_t::OVERFLOW) {
+        if (state == state_t::B_OVERFLOW) {
             // split root node
             split_root();
         }
@@ -471,7 +475,7 @@ public:
 
     void insert(Registro* registro) {
         auto state = root.insert(registro);
-        if (state == state_t::OVERFLOW) {
+        if (state == state_t::B_OVERFLOW) {
             // split root node
             split_root();
         }

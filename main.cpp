@@ -4,11 +4,8 @@
 
 using namespace std;
 
-vector<string> notFound;
-
 int main() {
     btree<char*> bt;
-    int cont = 0;
     ifstream file;
     vector<string> files = {"French.txt", "German.txt", "Italian.txt", "Spanish.txt", "Portuguese.txt"};
 
