@@ -5,9 +5,18 @@
 #include <iostream>
 #include <fstream>
 #include <cstring>
+#include <unordered_map>
 #include "funciones.h"
 
 int ORDER = 3;
+
+enum Language {
+    FRENCH,
+    PORTUGUESE,
+    SPANISH,
+    GERMAN,
+    ITALIAN
+};
 
 const std::string indexfile = "index.dat";
 #define FILESIZE getFileSize(indexfile)
@@ -39,21 +48,62 @@ bool isGreaterOrEqual(const char* palabra1, const char* palabra2) {
 
 struct Registro {
     char palabra[50]{};
-    vector<pair<unsigned long, unsigned long>> direcciones;
+    vector<pair<unsigned long, unsigned long>> direccionesF;
+    vector<pair<unsigned long, unsigned long>> direccionesP;
+    vector<pair<unsigned long, unsigned long>> direccionesS;
+    vector<pair<unsigned long, unsigned long>> direccionesG;
+    vector<pair<unsigned long, unsigned long>> direccionesI;
 
     Registro() = default;
 
-    Registro(const string& palabra, unsigned long direccion, unsigned long offset) {
+    Registro(const string& palabra, unsigned long direccion, unsigned long offset, Language lang) {
         strncpy(this->palabra, palabra.c_str(), 50);
-        direcciones.emplace_back(direccion, offset);
+        switch (lang){
+            case FRENCH: {
+                direccionesF.emplace_back(direccion, offset);
+                break;
+            }
+            case PORTUGUESE: {
+                direccionesP.emplace_back(direccion, offset);
+                break;
+            }
+            case SPANISH: {
+                direccionesS.emplace_back(direccion, offset);
+                break;
+            }
+            case GERMAN: {
+                direccionesG.emplace_back(direccion, offset);
+                break;
+            }
+            case ITALIAN: {
+                direccionesI.emplace_back(direccion, offset);
+                break;
+            }
+        }
     }
 
     void print() {
         if (!this) return;
         cout << palabra << " ";
-        for (const auto& i : direcciones) {
-            cout << i.first << " ";
-            cout << i.second << ". ";
+        cout << "\nFRENCH:" << '\n';
+        for (const auto& i : direccionesF) {
+            cout << i.first << " " << i.second << ". ";
+        }
+        cout << "\nPORTUGUESE:" << '\n';
+        for (const auto& i : direccionesP) {
+            cout << i.first << " " << i.second << ". ";
+        }
+        cout << "\nSPANISH:" << '\n';
+        for (const auto& i : direccionesS) {
+            cout << i.first << " " << i.second << ". ";
+        }
+        cout << "\nGERMAN:" << '\n';
+        for (const auto& i : direccionesG) {
+            cout << i.first << " " << i.second << ". ";
+        }
+        cout << "\nITALIAN:" << '\n';
+        for (const auto& i : direccionesI) {
+            cout << i.first << " " << i.second << ". ";
         }
         cout << endl;
     }
@@ -104,13 +154,34 @@ private:
             cout << "Prev: " << this->prev << "\n";
         }
 
-        void insert_into(size_t index, const string& key, unsigned long dir = 0, unsigned long off = 0) {
-            auto registro = new Registro(key, dir, off);
+        void insert_into(size_t index, const string& key, Language lang, unsigned long dir = 0, unsigned long off = 0) {
+            auto registro = new Registro(key, dir, off, lang);
             if (!this) return;
             size_t j = this->count;
             if (this->registros[index] && registro && strcmp(this->registros[index]->palabra, registro->palabra) == 0) {
 //                cout << "Son iguales" << endl;
-                registros[index]->direcciones.push_back(registro->direcciones[0]);
+                switch (lang){
+                    case FRENCH: {
+                        registros[index]->direccionesF.push_back(registro->direccionesF[0]);
+                        break;
+                    }
+                    case PORTUGUESE: {
+                        registros[index]->direccionesP.push_back(registro->direccionesP[0]);
+                        break;
+                    }
+                    case SPANISH: {
+                        registros[index]->direccionesS.push_back(registro->direccionesS[0]);
+                        break;
+                    }
+                    case GERMAN: {
+                        registros[index]->direccionesG.push_back(registro->direccionesG[0]);
+                        break;
+                    }
+                    case ITALIAN: {
+                        registros[index]->direccionesI.push_back(registro->direccionesI[0]);
+                        break;
+                    }
+                }
                 return;
             }
             while (j > index) {
@@ -126,12 +197,34 @@ private:
             this->count++;
         }
 
-        void insert_into(size_t index, Registro* registro) {
+        void insert_into(size_t index, Registro* registro, Language lang) {
             if (!this) return;
             size_t j = this->count;
             if (this->registros[index] && registro && strcmp(this->registros[index]->palabra, registro->palabra) == 0) {
 //                cout << "Son iguales" << endl;
-                registros[index]->direcciones.push_back(registro->direcciones[0]);
+                switch (lang){
+                    case FRENCH: {
+                        registros[index]->direccionesF.push_back(registro->direccionesF[0]);
+                        break;
+                    }
+                    case PORTUGUESE: {
+                        registros[index]->direccionesP.push_back(registro->direccionesP[0]);
+                        break;
+                    }
+                    case SPANISH: {
+                        registros[index]->direccionesS.push_back(registro->direccionesS[0]);
+                        break;
+                    }
+                    case GERMAN: {
+                        registros[index]->direccionesG.push_back(registro->direccionesG[0]);
+                        break;
+                    }
+                    case ITALIAN: {
+                        registros[index]->direccionesI.push_back(registro->direccionesI[0]);
+                        break;
+                    }
+                }
+                return;
                 return;
             }
             while (j > index) {
@@ -151,7 +244,7 @@ private:
             insert_into(this->count, value);
         }
 
-        state_t insert(Registro* registro) {
+        state_t insert(Registro* registro, Language lang) {
             // binary_search
             size_t index = 0;
             auto value = registro->palabra;
@@ -162,7 +255,7 @@ private:
 
             if (this->children[index] == 0) {
                 // this is a leaf node
-                this->insert_into(index, registro);
+                this->insert_into(index, registro, lang);
                 fstream myFile;
                 myFile.open(indexfile, ios::binary | ios::in | ios::out);
                 setWritePos(myFile, this->filePosition);
@@ -175,14 +268,14 @@ private:
                 auto child = readNode(myFile);
                 myFile.close();
 
-                auto state = child->insert(registro);
+                auto state = child->insert(registro, lang);
                 if (state == state_t::OVERFLOW) {
                     // split
                     myFile.open(indexfile, ios::binary | ios::in | ios::out);
                     setWritePos(myFile, child->filePosition);
                     writeNode(myFile, child);
                     myFile.close();
-                    this->split(index);
+                    this->split(index, lang);
                 } else {
                     myFile.open(indexfile, ios::binary | ios::in | ios::out);
                     setWritePos(myFile, this->children[index]);
@@ -194,7 +287,7 @@ private:
             return this->count > ORDER ? OVERFLOW : B_OK;
         }
 
-        void split(size_t position) {
+        void split(size_t position, Language lang) {
             // leaf nodes / index nodes
             node* parent = this;
             fstream myFile;
@@ -259,13 +352,6 @@ private:
             child1->next = child2->filePosition;
             child2->prev = child1->filePosition;
 
-            // FIXME: Esto da bug
-//            if (ptr_prev) {
-//                child1->prev = ptr_prev->filePosition;
-//                ptr_prev->next = child1->filePosition;
-//                parent->children[position - 1] = ptr_prev->filePosition;
-//            }
-
             myFile.open(indexfile, ios::app | ios::binary | ios::out);
             writeNode(myFile, child1);
             myFile.close();
@@ -274,14 +360,8 @@ private:
             child2->filePosition = FILESIZE;
             writeNode(myFile, child2);
             myFile.close();
-            // FIXME: Esto da bug
-//            if (ptr_next) {
-//                ptr_next->prev = child2->filePosition;
-//                child2->next = ptr_next->filePosition;
-//                parent->children[position + 2] = ptr_next->filePosition;
-//            }
 
-            parent->insert_into(position, ptr->data[mid]);
+            parent->insert_into(position, ptr->data[mid], lang);
             parent->children[position] = child1->filePosition;
             parent->children[position + 1] = child2->filePosition;
 
@@ -381,9 +461,9 @@ public:
         root.isLeaf = 1;
     }
 
-    void insert(const string& name, unsigned long dir, unsigned long off) {
-        auto registro = new Registro(name, dir, off);
-        auto state = root.insert(registro);
+    void insert(const string& name, unsigned long dir, unsigned long off, Language lang) {
+        auto registro = new Registro(name, dir, off, lang);
+        auto state = root.insert(registro, lang);
         if (state == state_t::OVERFLOW) {
             // split root node
             split_root();
@@ -728,42 +808,87 @@ public:
         return find_helper(_nodo, value, ptr);
     }
 
-    vector<string> build(const string& filename){
-        ifstream file(filename, ios::binary);
+    vector<string> build(const vector<string>& files) {
         vector<string> keys;
-        // ofstream keys("keys.db");
+        unordered_map<string, bool> hash;
+
+        ifstream file(files[0], ios::binary);
         string line, key;
         unsigned int pgdir = 0, offset;
-        while(getline(file,line)) {
+        while (getline(file, line)) {
             offset = (unsigned int) file.tellg() - pgdir;
             key = getFileNameFromRoute(line);
-            keys.push_back(key);
-            insert(key, pgdir, offset);
+            if (!hash[key]) {
+                hash[key] = true;
+                keys.push_back(key);
+            } // Ya inserto este key
+            insert(key, pgdir, offset, FRENCH);
             pgdir = file.tellg();
-//            cout << "================" << endl;
-//            cout << "key: " << key << endl;
-//            print();
         }
         file.close();
+
+        ifstream file1(files[1], ios::binary);
+        pgdir = 0;
+        while (getline(file, line)) {
+            offset = (unsigned int) file.tellg() - pgdir;
+            key = getFileNameFromRoute(line);
+            if (!hash[key]) {
+                hash[key] = true;
+                keys.push_back(key);
+            } // Ya inserto este key
+            insert(key, pgdir, offset, GERMAN);
+            pgdir = file.tellg();
+        }
+        file.close();
+
+        ifstream file2(files[2], ios::binary);
+        pgdir = 0;
+        while (getline(file, line)) {
+            offset = (unsigned int) file.tellg() - pgdir;
+            key = getFileNameFromRoute(line);
+            if (!hash[key]) {
+                hash[key] = true;
+                keys.push_back(key);
+            } // Ya inserto este key
+            insert(key, pgdir, offset, SPANISH);
+            pgdir = file.tellg();
+        }
+        file.close();
+
+        ifstream file3(files[3], ios::binary);
+        pgdir = 0;
+        while (getline(file, line)) {
+            offset = (unsigned int) file.tellg() - pgdir;
+            key = getFileNameFromRoute(line);
+            if (!hash[key]) {
+                hash[key] = true;
+                keys.push_back(key);
+            } // Ya inserto este key
+            insert(key, pgdir, offset, ITALIAN);
+            pgdir = file.tellg();
+        }
+        file.close();
+
+        ifstream file4(files[4], ios::binary);
+        pgdir = 0;
+        while (getline(file, line)) {
+            offset = (unsigned int) file.tellg() - pgdir;
+            key = getFileNameFromRoute(line);
+            if (!hash[key]) {
+                hash[key] = true;
+                keys.push_back(key);
+            } // Ya inserto este key
+            insert(key, pgdir, offset, PORTUGUESE);
+            pgdir = file.tellg();
+        }
+        file.close();
+
         return keys;
     }
 
 private:
-    string getFileNameFromRoute(string s) {
-        string delimiter = "/";
-
-        size_t pos = 0;
-        string token;
-        while ((pos = s.find(delimiter)) != string::npos) {
-            token = s.substr(0, pos);
-            s.erase(0, pos + delimiter.length());
-        }
-
-        if ((pos = s.find('.')) != string::npos) {
-            token = s.substr(0, pos);
-            return token;
-        }
-        return "error";
+    string getFileNameFromRoute(const string& s) {
+        return s.substr(0, s.find('\t'));
     }
 
     node root;

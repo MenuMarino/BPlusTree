@@ -22,7 +22,7 @@ cmake-build-debug/
 *.out.dSYM/
 *.swp
 *.vscode/
-*.txt
+CMakeLists.txt
 *.jpeg
 *.jpg
 *.png
