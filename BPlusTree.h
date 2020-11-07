@@ -225,7 +225,6 @@ private:
                     }
                 }
                 return;
-                return;
             }
             while (j > index) {
                 registros[j+1] = registros[j];
@@ -829,57 +828,57 @@ public:
 
         ifstream file1(files[1], ios::binary);
         pgdir = 0;
-        while (getline(file, line)) {
-            offset = (unsigned int) file.tellg() - pgdir;
+        while (getline(file1, line)) {
+            offset = (unsigned int) file1.tellg() - pgdir;
             key = getFileNameFromRoute(line);
             if (!hash[key]) {
                 hash[key] = true;
                 keys.push_back(key);
             } // Ya inserto este key
             insert(key, pgdir, offset, GERMAN);
-            pgdir = file.tellg();
+            pgdir = file1.tellg();
         }
         file.close();
 
         ifstream file2(files[2], ios::binary);
         pgdir = 0;
-        while (getline(file, line)) {
-            offset = (unsigned int) file.tellg() - pgdir;
+        while (getline(file2, line)) {
+            offset = (unsigned int) file2.tellg() - pgdir;
             key = getFileNameFromRoute(line);
             if (!hash[key]) {
                 hash[key] = true;
                 keys.push_back(key);
             } // Ya inserto este key
             insert(key, pgdir, offset, SPANISH);
-            pgdir = file.tellg();
+            pgdir = file2.tellg();
         }
         file.close();
 
         ifstream file3(files[3], ios::binary);
         pgdir = 0;
-        while (getline(file, line)) {
-            offset = (unsigned int) file.tellg() - pgdir;
+        while (getline(file3, line)) {
+            offset = (unsigned int) file3.tellg() - pgdir;
             key = getFileNameFromRoute(line);
             if (!hash[key]) {
                 hash[key] = true;
                 keys.push_back(key);
             } // Ya inserto este key
             insert(key, pgdir, offset, ITALIAN);
-            pgdir = file.tellg();
+            pgdir = file3.tellg();
         }
         file.close();
 
         ifstream file4(files[4], ios::binary);
         pgdir = 0;
-        while (getline(file, line)) {
-            offset = (unsigned int) file.tellg() - pgdir;
+        while (getline(file4, line)) {
+            offset = (unsigned int) file4.tellg() - pgdir;
             key = getFileNameFromRoute(line);
             if (!hash[key]) {
                 hash[key] = true;
                 keys.push_back(key);
             } // Ya inserto este key
             insert(key, pgdir, offset, PORTUGUESE);
-            pgdir = file.tellg();
+            pgdir = file4.tellg();
         }
         file.close();
 
